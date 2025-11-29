@@ -1,16 +1,17 @@
 package com.example.onlinestore.service;
 
-import com.example.onlinestore.entity.OrderItem;
+import com.example.onlinestore.dto.OrderItemDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderItemService {
-    List<OrderItem> findAll();
+    List<OrderItemDTO> findAll();
 
-    Optional<OrderItem> findById(Long id);
+    OrderItemDTO findById(Long id);
 
-    OrderItem save(OrderItem orderItem);
+    OrderItemDTO save(OrderItemDTO orderItemDTO);
+
+    OrderItemDTO update(Long id, OrderItemDTO orderItemDTO);
 
     void deleteById(Long id);
 }

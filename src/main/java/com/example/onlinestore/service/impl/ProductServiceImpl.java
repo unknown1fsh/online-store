@@ -2,6 +2,7 @@ package com.example.onlinestore.service.impl;
 
 import com.example.onlinestore.dto.ProductDTO;
 import com.example.onlinestore.entity.Product;
+import com.example.onlinestore.exception.ResourceNotFoundException;
 import com.example.onlinestore.mapper.ProductMapper;
 import com.example.onlinestore.repository.ProductRepository;
 import com.example.onlinestore.service.ProductService;
@@ -30,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         return productMapper.toDTO(product);
     }
 
@@ -43,16 +44,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
         product.setName(productDTO.getName());
         product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
-        product.setStock(productDTO.getStock());
+        if (productDTO.getPrice() != null) {
+            product.setPrice(productDTO.getPrice());
+        }
+        if (productDTO.getStock() != null) {
+            product.setStock(productDTO.getStock());
+        }
         return productMapper.toDTO(productRepository.save(product));
     }
 
     @Override
     public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with id: " + id);
+        }
         productRepository.deleteById(id);
     }
 }

@@ -2,6 +2,7 @@ package com.example.onlinestore.service.impl;
 
 import com.example.onlinestore.dto.CategoryDTO;
 import com.example.onlinestore.entity.Category;
+import com.example.onlinestore.exception.ResourceNotFoundException;
 import com.example.onlinestore.mapper.CategoryMapper;
 import com.example.onlinestore.repository.CategoryRepository;
 import com.example.onlinestore.service.CategoryService;
@@ -30,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         return categoryMapper.toDTO(category);
     }
 
@@ -43,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         category.setName(categoryDTO.getName());
         category.setDescription(categoryDTO.getDescription());
         return categoryMapper.toDTO(categoryRepository.save(category));
@@ -51,6 +52,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Category not found with id: " + id);
+        }
         categoryRepository.deleteById(id);
     }
 }

@@ -2,6 +2,7 @@ package com.example.onlinestore.service.impl;
 
 import com.example.onlinestore.dto.CustomerDTO;
 import com.example.onlinestore.entity.Customer;
+import com.example.onlinestore.exception.ResourceNotFoundException;
 import com.example.onlinestore.mapper.CustomerMapper;
 import com.example.onlinestore.repository.CustomerRepository;
 import com.example.onlinestore.service.CustomerService;
@@ -30,7 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDTO getCustomerById(Long id) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
         return customerMapper.toDTO(customer);
     }
 
@@ -43,7 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
         customer.setFirstName(customerDTO.getFirstName());
         customer.setLastName(customerDTO.getLastName());
         customer.setEmail(customerDTO.getEmail());
@@ -54,6 +55,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(Long id) {
+        if (!customerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Customer not found with id: " + id);
+        }
         customerRepository.deleteById(id);
     }
 }

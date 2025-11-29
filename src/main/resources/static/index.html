@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Store - API Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 0 15px 15px 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 500px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .order-items {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .order-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                border-radius: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Online Store</h1>
+            <p>REST API Test Interface</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('categories')">Categories</button>
+            <button class="tab" onclick="showTab('products')">Products</button>
+            <button class="tab" onclick="showTab('customers')">Customers</button>
+            <button class="tab" onclick="showTab('orders')">Orders</button>
+            <button class="tab" onclick="showTab('order-items')">Order Items</button>
+        </div>
+
+        <!-- Categories Tab -->
+        <div id="categories" class="tab-content active">
+            <div class="section">
+                <h2>Create Category</h2>
+                <div id="category-alert" class="alert"></div>
+                <form id="category-form">
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" id="category-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="category-description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Category</button>
+                </form>
+            </div>
+            <div class="section">
+                <h2>Categories List</h2>
+                <button onclick="loadCategories()" class="btn btn-secondary">Refresh</button>
+                <div id="categories-list" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products" class="tab-content">
+            <div class="section">
+                <h2>Create Product</h2>
+                <div id="product-alert" class="alert"></div>
+                <form id="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" id="product-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Price *</label>
+                            <input type="number" id="product-price" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Stock *</label>
+                            <input type="number" id="product-stock" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category ID</label>
+                            <input type="number" id="product-category-id">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="product-description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Product</button>
+                </form>
+            </div>
+            <div class="section">
+                <h2>Products List</h2>
+                <button onclick="loadProducts()" class="btn btn-secondary">Refresh</button>
+                <div id="products-list" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Customers Tab -->
+        <div id="customers" class="tab-content">
+            <div class="section">
+                <h2>Create Customer</h2>
+                <div id="customer-alert" class="alert"></div>
+                <form id="customer-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="customer-firstname" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="customer-lastname" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="customer-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="customer-phone">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="customer-address" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Customer</button>
+                </form>
+            </div>
+            <div class="section">
+                <h2>Customers List</h2>
+                <button onclick="loadCustomers()" class="btn btn-secondary">Refresh</button>
+                <div id="customers-list" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders" class="tab-content">
+            <div class="section">
+                <h2>Create Order</h2>
+                <div id="order-alert" class="alert"></div>
+                <form id="order-form">
+                    <div class="form-group">
+                        <label>Customer ID *</label>
+                        <input type="number" id="order-customer-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Order Items *</label>
+                        <div id="order-items-container">
+                            <div class="order-item">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Product ID *</label>
+                                        <input type="number" class="order-item-product-id" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quantity *</label>
+                                        <input type="number" class="order-item-quantity" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Price *</label>
+                                        <input type="number" step="0.01" class="order-item-price" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addOrderItem()" class="btn btn-secondary">Add Item</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Order</button>
+                </form>
+            </div>
+            <div class="section">
+                <h2>Orders List</h2>
+                <button onclick="loadOrders()" class="btn btn-secondary">Refresh</button>
+                <div id="orders-list" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Order Items Tab -->
+        <div id="order-items" class="tab-content">
+            <div class="section">
+                <h2>Order Items List</h2>
+                <button onclick="loadOrderItems()" class="btn btn-secondary">Refresh</button>
+                <div id="order-items-list" class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8081/api';
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'categories') loadCategories();
+            else if (tabName === 'products') loadProducts();
+            else if (tabName === 'customers') loadCustomers();
+            else if (tabName === 'orders') loadOrders();
+            else if (tabName === 'order-items') loadOrderItems();
+        }
+
+        function showAlert(elementId, message, isError = false) {
+            const alert = document.getElementById(elementId);
+            alert.textContent = message;
+            alert.className = `alert ${isError ? 'alert-error' : 'alert-success'} show`;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        async function apiCall(url, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (body) options.body = JSON.stringify(body);
+                const response = await fetch(`${API_BASE}${url}`, options);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Request failed');
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // Categories
+        document.getElementById('category-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await apiCall('/categories', 'POST', {
+                    name: document.getElementById('category-name').value,
+                    description: document.getElementById('category-description').value
+                });
+                showAlert('category-alert', 'Category created successfully!');
+                document.getElementById('category-form').reset();
+                loadCategories();
+            } catch (error) {
+                showAlert('category-alert', error.message, true);
+            }
+        });
+
+        async function loadCategories() {
+            try {
+                const categories = await apiCall('/categories');
+                const list = document.getElementById('categories-list');
+                if (categories.length === 0) {
+                    list.innerHTML = '<p>No categories found.</p>';
+                    return;
+                }
+                list.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${categories.map(cat => `
+                                <tr>
+                                    <td>${cat.id}</td>
+                                    <td>${cat.name}</td>
+                                    <td>${cat.description || '-'}</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="deleteCategory(${cat.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                document.getElementById('categories-list').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Delete this category?')) return;
+            try {
+                await apiCall(`/categories/${id}`, 'DELETE');
+                loadCategories();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Products
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await apiCall('/products', 'POST', {
+                    name: document.getElementById('product-name').value,
+                    description: document.getElementById('product-description').value,
+                    price: parseFloat(document.getElementById('product-price').value),
+                    stock: parseInt(document.getElementById('product-stock').value),
+                    categoryId: document.getElementById('product-category-id').value ? 
+                        parseInt(document.getElementById('product-category-id').value) : null
+                });
+                showAlert('product-alert', 'Product created successfully!');
+                document.getElementById('product-form').reset();
+                loadProducts();
+            } catch (error) {
+                showAlert('product-alert', error.message, true);
+            }
+        });
+
+        async function loadProducts() {
+            try {
+                const products = await apiCall('/products');
+                const list = document.getElementById('products-list');
+                if (products.length === 0) {
+                    list.innerHTML = '<p>No products found.</p>';
+                    return;
+                }
+                list.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Category ID</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${products.map(p => `
+                                <tr>
+                                    <td>${p.id}</td>
+                                    <td>${p.name}</td>
+                                    <td>${p.description || '-'}</td>
+                                    <td>$${p.price?.toFixed(2) || '0.00'}</td>
+                                    <td>${p.stock || 0}</td>
+                                    <td>${p.categoryId || '-'}</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="deleteProduct(${p.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                document.getElementById('products-list').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Delete this product?')) return;
+            try {
+                await apiCall(`/products/${id}`, 'DELETE');
+                loadProducts();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Customers
+        document.getElementById('customer-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await apiCall('/customers', 'POST', {
+                    firstName: document.getElementById('customer-firstname').value,
+                    lastName: document.getElementById('customer-lastname').value,
+                    email: document.getElementById('customer-email').value,
+                    phone: document.getElementById('customer-phone').value,
+                    address: document.getElementById('customer-address').value
+                });
+                showAlert('customer-alert', 'Customer created successfully!');
+                document.getElementById('customer-form').reset();
+                loadCustomers();
+            } catch (error) {
+                showAlert('customer-alert', error.message, true);
+            }
+        });
+
+        async function loadCustomers() {
+            try {
+                const customers = await apiCall('/customers');
+                const list = document.getElementById('customers-list');
+                if (customers.length === 0) {
+                    list.innerHTML = '<p>No customers found.</p>';
+                    return;
+                }
+                list.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${customers.map(c => `
+                                <tr>
+                                    <td>${c.id}</td>
+                                    <td>${c.firstName}</td>
+                                    <td>${c.lastName}</td>
+                                    <td>${c.email}</td>
+                                    <td>${c.phone || '-'}</td>
+                                    <td>${c.address || '-'}</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="deleteCustomer(${c.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                document.getElementById('customers-list').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm('Delete this customer?')) return;
+            try {
+                await apiCall(`/customers/${id}`, 'DELETE');
+                loadCustomers();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Orders
+        function addOrderItem() {
+            const container = document.getElementById('order-items-container');
+            const item = document.createElement('div');
+            item.className = 'order-item';
+            item.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product ID *</label>
+                        <input type="number" class="order-item-product-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" class="order-item-quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price *</label>
+                        <input type="number" step="0.01" class="order-item-price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.parentElement.remove()">Remove</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(item);
+        }
+
+        document.getElementById('order-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const items = Array.from(document.querySelectorAll('.order-item')).map(item => ({
+                    productId: parseInt(item.querySelector('.order-item-product-id').value),
+                    quantity: parseInt(item.querySelector('.order-item-quantity').value),
+                    price: parseFloat(item.querySelector('.order-item-price').value)
+                }));
+                await apiCall('/orders', 'POST', {
+                    customerId: parseInt(document.getElementById('order-customer-id').value),
+                    orderDate: new Date().toISOString(),
+                    orderItems: items
+                });
+                showAlert('order-alert', 'Order created successfully!');
+                document.getElementById('order-form').reset();
+                document.getElementById('order-items-container').innerHTML = '';
+                addOrderItem();
+                loadOrders();
+            } catch (error) {
+                showAlert('order-alert', error.message, true);
+            }
+        });
+
+        async function loadOrders() {
+            try {
+                const orders = await apiCall('/orders');
+                const list = document.getElementById('orders-list');
+                if (orders.length === 0) {
+                    list.innerHTML = '<p>No orders found.</p>';
+                    return;
+                }
+                list.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer ID</th>
+                                <th>Order Date</th>
+                                <th>Total</th>
+                                <th>Items</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orders.map(o => `
+                                <tr>
+                                    <td>${o.id}</td>
+                                    <td>${o.customerId}</td>
+                                    <td>${o.orderDate ? new Date(o.orderDate).toLocaleString() : '-'}</td>
+                                    <td>$${o.total?.toFixed(2) || '0.00'}</td>
+                                    <td>${o.orderItems?.length || 0}</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="deleteOrder(${o.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                document.getElementById('orders-list').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function deleteOrder(id) {
+            if (!confirm('Delete this order?')) return;
+            try {
+                await apiCall(`/orders/${id}`, 'DELETE');
+                loadOrders();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Order Items
+        async function loadOrderItems() {
+            try {
+                const items = await apiCall('/order-items');
+                const list = document.getElementById('order-items-list');
+                if (items.length === 0) {
+                    list.innerHTML = '<p>No order items found.</p>';
+                    return;
+                }
+                list.innerHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product ID</th>
+                                <th>Order ID</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(item => `
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.productId}</td>
+                                    <td>${item.orderId || '-'}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${item.price?.toFixed(2) || '0.00'}</td>
+                                    <td>
+                                        <button class="btn btn-danger" onclick="deleteOrderItem(${item.id})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                document.getElementById('order-items-list').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function deleteOrderItem(id) {
+            if (!confirm('Delete this order item?')) return;
+            try {
+                await apiCall(`/order-items/${id}`, 'DELETE');
+                loadOrderItems();
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Load initial data
+        loadCategories();
+    </script>
+</body>
+</html>
+

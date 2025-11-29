@@ -6,8 +6,8 @@ import com.example.onlinestore.entity.Customer;
 import com.example.onlinestore.entity.CustomerOrder;
 import com.example.onlinestore.entity.OrderItem;
 import com.example.onlinestore.entity.Product;
+import com.example.onlinestore.exception.ResourceNotFoundException;
 import com.example.onlinestore.mapper.CustomerOrderMapper;
-import com.example.onlinestore.mapper.OrderItemMapper;
 import com.example.onlinestore.repository.CustomerOrderRepository;
 import com.example.onlinestore.repository.CustomerRepository;
 import com.example.onlinestore.repository.OrderItemRepository;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,9 +30,6 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Autowired
     private CustomerOrderMapper orderMapper;
-
-    @Autowired
-    private OrderItemMapper orderItemMapper;
 
     @Autowired
     private ProductRepository productRepository;
@@ -52,7 +50,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Override
     public CustomerOrderDTO getOrderById(Long id) {
         CustomerOrder order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + id));
         return orderMapper.toDTO(order);
     }
 
@@ -60,12 +58,12 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     @Transactional
     public CustomerOrderDTO createOrder(CustomerOrderDTO orderDTO) {
         Customer customer = customerRepository.findById(orderDTO.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + orderDTO.getCustomerId()));
 
         // Siparişi oluştur ve müşteriyi ekle
         CustomerOrder order = new CustomerOrder();
         order.setCustomer(customer);
-        order.setOrderDate(orderDTO.getOrderDate()); // Sipariş tarihini ayarlıyoruz
+        order.setOrderDate(orderDTO.getOrderDate() != null ? orderDTO.getOrderDate() : LocalDateTime.now());
 
         double total = 0.0;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -73,10 +71,10 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
         // Her bir OrderItemDTO için işleme başla
         for (OrderItemDTO orderItemDTO : orderDTO.getOrderItems()) {
             Product product = productRepository.findById(orderItemDTO.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + orderItemDTO.getProductId()));
 
             if (product.getStock() < orderItemDTO.getQuantity()) {
-                throw new RuntimeException("Not enough stock for product: " + product.getName());
+                throw new IllegalArgumentException("Not enough stock for product: " + product.getName() + ". Available: " + product.getStock() + ", Requested: " + orderItemDTO.getQuantity());
             }
 
             // OrderItem oluştur ve gerekli ilişkileri kur
@@ -108,6 +106,9 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
 
     @Override
     public void deleteOrder(Long id) {
+        if (!orderRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Order not found with id: " + id);
+        }
         orderRepository.deleteById(id);
     }
 }
