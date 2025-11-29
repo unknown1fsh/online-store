@@ -407,10 +407,6 @@ Bu proje MIT Lisansı altında lisanslanmıştır.
 
 ## 👤 Contact / İletişim
 
-**Selim Sercan Çınar**
-
-- 📧 Email: [selimsercancinar@outlook.com](mailto:selimsercancinar@outlook.com)
-- 💼 LinkedIn: [ssercanc](https://www.linkedin.com/in/ssercanc/)
 - 🐙 GitHub: [unknown1fsh](https://github.com/unknown1fsh)
 
 ---
